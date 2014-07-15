@@ -59,16 +59,19 @@ type Cipher struct {
 // bits long, and the nonce argument must be 64 bits long. The nonce must be
 // randomly generated or used only once. This Cipher instance must not be used
 // to encrypt more than 2^70 bytes (~1 zettabyte).
-func NewCipher(key []byte, nonce []byte) (*Cipher, error) {
+func NewCipher(key, nonce []byte) (*Cipher, error) {
+	c := &Cipher{}
+	return c, c.Initialize(key, nonce)
+}
+
+func (c *Cipher) Initialize(key, nonce []byte) error {
 	if len(key) != KeySize {
-		return nil, ErrInvalidKey
+		return ErrInvalidKey
 	}
 
 	if len(nonce) != NonceSize {
-		return nil, ErrInvalidNonce
+		return ErrInvalidNonce
 	}
-
-	c := new(Cipher)
 
 	// the magic constants for 256-bit keys
 	c.state[0] = 0x61707865
@@ -92,7 +95,7 @@ func NewCipher(key []byte, nonce []byte) (*Cipher, error) {
 
 	c.advance()
 
-	return c, nil
+	return nil
 }
 
 // XORKeyStream sets dst to the result of XORing src with the key stream.
